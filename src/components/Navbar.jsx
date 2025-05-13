@@ -13,6 +13,7 @@ const NavBar = () => {
   // State for toggling audio and visual indicator
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isIndicatorActive, setIsIndicatorActive] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
 
   // Refs for audio and navigation container
   const audioElementRef = useRef(null);
@@ -21,6 +22,15 @@ const NavBar = () => {
   const { y: currentScrollY } = useWindowScroll();
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Show tooltip for 5 seconds on component mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowTooltip(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Toggle audio and visual indicator
   const toggleAudioIndicator = () => {
@@ -124,30 +134,40 @@ const NavBar = () => {
               ))}
             </div>
 
-            <button
-              onClick={toggleAudioIndicator}
-              className="ml-10 flex items-center space-x-0.5"
-            >
-              <audio
-                ref={audioElementRef}
-                className="hidden"
-                src="../audio/loop.mp3"
-                loop
-                volume="1.0"
-                muted={false}
-              />
-              {[1, 2, 3, 4].map((bar) => (
-                <div
-                  key={bar}
-                  className={clsx("indicator-line", {
-                    active: isIndicatorActive,
-                  })}
-                  style={{
-                    animationDelay: `${bar * 0.1}s`,
-                  }}
+            <div className="relative">
+              {showTooltip && (
+                <div className="absolute top-8 right-0 animate-bounce">
+                  <div className="bg-pink-400/90 text-white px-2 py-1 rounded text-xs font-medium shadow-sm relative">
+                    Tap for music 🎵
+                    <div className="absolute -top-1.5 right-2 w-3 h-3 bg-pink-400/90 transform rotate-45"></div>
+                  </div>
+                </div>
+              )}
+              <button
+                onClick={toggleAudioIndicator}
+                className="ml-10 flex items-center space-x-0.5"
+              >
+                <audio
+                  ref={audioElementRef}
+                  className="hidden"
+                  src="../audio/loop.mp3"
+                  loop
+                  volume="1.0"
+                  muted={false}
                 />
-              ))}
-            </button>
+                {[1, 2, 3, 4].map((bar) => (
+                  <div
+                    key={bar}
+                    className={clsx("indicator-line", {
+                      active: isIndicatorActive,
+                    })}
+                    style={{
+                      animationDelay: `${bar * 0.1}s`,
+                    }}
+                  />
+                ))}
+              </button>
+            </div>
           </div>
         </nav>
       </header>
